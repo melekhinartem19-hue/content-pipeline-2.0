@@ -1,0 +1,104 @@
+# Секреты — НИКОГДА не коммитить (правило CLAUDE.md)
+.env
+*.env
+!.env.example
+!*.env.example
+
+# Node
+node_modules/
+npm-debug.log*
+
+# SQLite (появится в T02)
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.db
+
+# ОС / редактор
+.DS_Store
+Thumbs.db
+
+# Отрендеренные картинки (T10) — артефакты прогонов, не исходники
+dispatcher/data/renders/
+render/out/
+
+# Источники сбора трендов (T09) — данные конкретной установки, а не код.
+# В репозитории живёт только шаблон trends/sources.example.json.
+trends/sources.json
+
+# Темы инста-воронки (T13/T14) — данные конкретной установки, а не код.
+# В репозитории живёт только шаблон manychat/funnel.example.json.
+manychat/funnel.json
+
+# Собранные PDF-лид-магниты (T13) — артефакты прогонов, не исходники
+dispatcher/data/pdf/
+
+# Доступ ноутбука к VPS (T15) — адрес сервера клиента, а не код.
+# В репозитории живёт только шаблон video/vps.env.example.
+video/vps.env
+
+# Файлы, которые клиент прислал боту «Мозг бренда» (T18), — данные клиента, а не код.
+# В репозитории живёт только README, объясняющий папку.
+brand-brain/materials/*
+!brand-brain/materials/README.md
+
+# Профиль браузера с сессией Instagram/Threads (вариант C) — внутри живые куки входа.
+# Это ТЕ ЖЕ САМЫЕ креды: кто унесёт папку, тот зайдёт в аккаунт клиента без пароля.
+# Бэкапить вместе с brand-brain, коммитить — никогда.
+dispatcher/data/browser-profile/
+dispatcher/data/browser-shots/
+
+# Public repository: local settings and credentials
+.env.*
+*.env.*
+!.env.example
+!*env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+id_rsa*
+id_ed25519*
+.npmrc
+.netrc
+.git-credentials
+credentials.json
+service-account*.json
+secrets.json
+secrets/
+.ssh/
+.auth/
+.claude/
+.codex/
+.agents/
+
+# Runtime data, sessions, logs, caches and local history
+dispatcher/data/
+*.db-*
+*.sqlite3*
+*.session
+*.session-journal
+cookies*.json
+storage-state*.json
+*.log
+logs/
+.cache/
+.history/
+.idea/
+.vscode/
+
+# Backups, temporary files and source archives
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+*~
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz

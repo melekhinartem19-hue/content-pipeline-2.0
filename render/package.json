@@ -1,0 +1,18 @@
+{
+  "name": "content-pipeline-render",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Рендер визуала контент-конвейера: спецификация Дизайнера → PNG каруселей и обложек (T10) и структура Презентатора → PDF-лид-магнит A4 (T13), всё через headless Chromium. Модуль отдельный от диспетчера — у него своя тяжёлая зависимость (браузерный клиент), и на машинах без визуала его можно не ставить.",
+  "main": "index.js",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node demo.mjs",
+    "demo:pdf": "node demo-pdf.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.63.0"
+  }
+}

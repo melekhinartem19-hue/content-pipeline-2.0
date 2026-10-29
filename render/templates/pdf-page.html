@@ -1,0 +1,22 @@
+<!--
+  Разметка ОДНОЙ страницы PDF (T13). Вставляется в pdf.html вместо {{PAGES}} столько раз,
+  сколько страниц в структуре Презентатора. Весь CSS — в pdf.html, здесь только каркас.
+
+  Кегли ({{TITLE_SIZE}} / {{TEXT_SIZE}}) считает render/pdf.js по длине текста: лист A4
+  фиксирован, поэтому длинный заголовок должен ужаться сам, а не уехать за край.
+-->
+<section class="page{{LAST}}" data-role="{{ROLE}}">
+  <div class="motif">{{MOTIF}}</div>
+
+  <div class="row head">
+    <span class="num">{{NUM}}</span>
+    <span class="rule"></span>
+  </div>
+
+  <div class="row body">
+    <div class="title" style="font-size: {{TITLE_SIZE}}px">{{TITLE}}</div>
+    <div class="text" style="font-size: {{TEXT_SIZE}}px">{{TEXT}}</div>
+  </div>
+
+  <div class="row foot"><span>{{HANDLE}}</span></div>
+</section>

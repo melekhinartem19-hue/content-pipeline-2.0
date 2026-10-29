@@ -1,0 +1,183 @@
+<!doctype html>
+<!--
+  Скелет PDF-лид-магнита (T13): страницы A4 (210×297 мм) одним документом.
+
+  ЭТО ГЛАВНЫЙ ФАЙЛ ДЛЯ ПРАВКИ ВНЕШНЕГО ВИДА ДОКУМЕНТА — здесь весь CSS: поля, типографика,
+  оформление ролей `cover` / `body` / `cta`. Разметка одной страницы — в pdf-page.html.
+  Трогать JS для смены вида не нужно.
+
+  Значения в двойных фигурных скобках подставляет render/pdf.js; в тег body уезжают все страницы
+  подряд (ключ PAGES). Внутри ЭТОГО комментария фигурные скобки писать нельзя: подстановка их
+  тоже заменит, и документ соберётся дважды — один раз в комментарии, один раз по делу.
+  Текст агента экранируется там же, поэтому вставлять сюда что-то от него напрямую нельзя.
+
+  Цвета и шрифт приезжают из brand-brain/08-visual-style.md (см. render/theme.js).
+  Пустой слот = нейтральная тёмная тема, это ожидаемо до наполнения клиентом.
+
+  Про печать: размер листа в @page и размер бумаги в render/pdf.js — ОДНО И ТО ЖЕ число
+  (794×1123 px = A4). Почему это важно — в комментарии у правила .page ниже.
+-->
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{DOC_TITLE}}</title>
+    <style>
+      /*
+        Размер листа задаётся в ПИКСЕЛЯХ и ровно тем же числом, что и .page ниже:
+        794×1123 px при 96 dpi = 209.9×297.0 мм, то есть A4 с точностью до десятой миллиметра.
+        Так лист-вёрстка и лист-бумага — одно и то же число, и разъехаться им негде.
+      */
+      @page {
+        size: {{W}}px {{H}}px;
+        margin: 0;
+      }
+
+      :root {
+        --bg: {{BG}};
+        --fg: {{FG}};
+        --accent: {{ACCENT}};
+        --on-accent: {{ON_ACCENT}};
+        --pad: 64px;
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: {{FONT}};
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        /* Фон и плашки должны попасть в файл, а не остаться белым листом. */
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      /* ── Лист ────────────────────────────────────────────────────────── */
+      /*
+        ГОЧА, СТОИВШАЯ ОТЛАДКИ: размер листа и размер бумаги обязаны совпадать ДО пикселя.
+        Пока бумага задавалась как «A4», Chromium брал 594.96×841.92 pt (это 209.89×297.0 мм),
+        а лист в 210 мм оказывался шире бумаги — и каждая страница роняла полоску на следующую:
+        5 страниц превращались в 11, половина пустых. Поэтому и @page, и .page считают одно и
+        то же {{W}}×{{H}}, а render/pdf.js передаёт эти же числа в page.pdf().
+      */
+      .page {
+        position: relative;
+        width: {{W}}px;
+        height: {{H}}px;
+        padding: var(--pad);
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+      }
+      /*
+        Разрыв ПЕРЕД листом, а не после. Лист ровно в высоту бумаги уже заполняет её целиком,
+        и «разрыв после» добавляет к каждому листу пустой — 5 страниц выходили 11 (тоже проверено).
+        Перед первым листом разрыв не нужен, поэтому правило начинается со второго.
+      */
+      .page + .page {
+        break-before: page;
+        page-break-before: always;
+      }
+
+      /* Абстрактный акцент-мотив: под контентом, никогда его не перекрывает. */
+      .motif {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .motif svg { width: 100%; height: 100%; display: block; }
+
+      .row { position: relative; z-index: 1; }
+
+      /* ── Колонтитул: номер страницы ──────────────────────────────────── */
+      .head {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 15px;
+        letter-spacing: 0.1em;
+      }
+      .num { opacity: 0.75; white-space: nowrap; }
+      /* На обложке номера нет — иначе линейка начиналась бы с пустого отступа. */
+      .num:empty { display: none; }
+      .rule { flex: 1; height: 2px; background: currentColor; opacity: 0.2; }
+
+      /* ── Тело страницы ───────────────────────────────────────────────── */
+      .body {
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+        flex: 1;
+        justify-content: center;
+        padding: 40px 0;
+      }
+      .title {
+        line-height: 1.12;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .text {
+        line-height: 1.55;
+        font-weight: 400;
+        opacity: 0.92;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .title:empty, .text:empty { display: none; }
+
+      /* ── Подвал: подпись бренда ──────────────────────────────────────── */
+      .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 15px;
+        letter-spacing: 0.06em;
+        opacity: 0.7;
+      }
+
+      /* ── Роли страниц ────────────────────────────────────────────────── */
+
+      /* Обложка: обещание результата во весь лист, подводка под ним. */
+      [data-role='cover'] .body { justify-content: flex-end; gap: 22px; }
+      [data-role='cover'] .title { letter-spacing: -0.03em; }
+      [data-role='cover'] .text { opacity: 0.8; max-width: 78%; }
+      [data-role='cover'] .title::after {
+        content: '';
+        display: block;
+        width: 140px;
+        height: 10px;
+        margin-top: 32px;
+        background: var(--accent);
+        border-radius: 5px;
+      }
+
+      /* Раскрытие: заголовок-подводка, основной вес на тексте. Блок по центру листа — короткая
+         страница так выглядит задуманной, а не оборванной; длинная всё равно занимает лист целиком. */
+      [data-role='body'] .title { font-weight: 700; }
+      [data-role='body'] .title::after {
+        content: '';
+        display: block;
+        width: 90px;
+        height: 6px;
+        margin-top: 20px;
+        background: var(--accent);
+        border-radius: 3px;
+      }
+
+      /* Финал с призывом: акцент заливает лист — последнюю страницу невозможно пролистнуть мимо. */
+      [data-role='cta'] { background: var(--accent); color: var(--on-accent); }
+      [data-role='cta'] .body { justify-content: center; }
+      [data-role='cta'] .text { opacity: 0.9; }
+      [data-role='cta'] .motif { opacity: 0.5; }
+    </style>
+  </head>
+  <body>
+    {{PAGES}}
+  </body>
+</html>

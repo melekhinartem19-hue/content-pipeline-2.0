@@ -1,0 +1,26 @@
+{
+  "_": "Фикстура для smoke-trends: две площадки с РАЗНЫМИ именами полей у акторов — на ней проверяется, что смена актора не требует правки кода.",
+  "limits": { "runsPerDay": 1, "postsPerSource": 5, "maxPostsPerRun": 10 },
+  "platforms": {
+    "ig": {
+      "enabled": true,
+      "actor": "apify/instagram-scraper",
+      "accounts": ["nike"],
+      "hashtags": ["маркетинг"],
+      "request": {
+        "urlsField": "directUrls",
+        "limitField": "resultsLimit",
+        "extra": { "resultsType": "posts", "_": "подсказка-человеку, в актор уходить не должна" }
+      },
+      "map": {}
+    },
+    "threads": {
+      "enabled": true,
+      "actor": "some/threads-scraper",
+      "accounts": ["zuck"],
+      "hashtags": [],
+      "request": { "urlsField": "urls", "limitField": "maxItems", "extra": {} },
+      "map": { "text": ["postText"], "likes": ["stats.likes"], "author": ["user.handle"] }
+    }
+  }
+}

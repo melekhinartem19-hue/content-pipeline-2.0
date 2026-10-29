@@ -1,0 +1,50 @@
+; Автозапуск диспетчера контент-конвейера (6 Telegram-ботов, очередь, публикация, воронка).
+;
+; Установка:
+;   sudo cp deploy/systemd/content-pipeline.service /etc/systemd/system/
+;   sudo systemctl daemon-reload && sudo systemctl enable --now content-pipeline
+;
+; Подробности и типовые сбои — deploy/systemd/README.md.
+
+[Unit]
+Description=Content Pipeline dispatcher (6 Telegram bots)
+Documentation=file:/opt/content-pipeline/CLAUDE.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pipeline
+Group=pipeline
+WorkingDirectory=/opt/content-pipeline/dispatcher
+
+; --env-file читает dispatcher/.env — секреты не попадают ни в юнит, ни в journal.
+ExecStart=/usr/bin/node --env-file=.env src/index.js
+
+; HOME обязателен: диспетчер запускает `claude -p` подпроцессом, а логин Claude Code лежит
+; в ~/.claude. Без HOME агенты молча перестают отвечать. Там же кэш браузера playwright.
+Environment=HOME=/opt/content-pipeline
+Environment=NODE_ENV=production
+
+; PATH обязателен вместе с HOME. Claude Code ставится нативным установщиком в ~/.local/bin
+; пользователя, а systemd даёт процессу урезанный PATH (/usr/local/bin:/usr/bin:/bin) — при
+; CLAUDE_BIN=claude подпроцесс не найдётся, и агенты замолчат, хотя в консоли всё работает.
+Environment=PATH=/opt/content-pipeline/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+; Долгоживущий процесс: long polling Telegram рвётся сам по себе, это норма.
+Restart=always
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=content-pipeline
+
+; Лёгкая изоляция. ProtectHome НЕ включаем: HOME пользователя нужен для логина Claude
+; и кэша браузера — именно там лежит то, без чего система не думает и не рисует.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/content-pipeline /var/www/content-pipeline
+
+[Install]
+WantedBy=multi-user.target

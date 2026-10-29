@@ -1,0 +1,27 @@
+{
+  "name": "content-pipeline-dispatcher",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Node-диспетчер контент-конвейера: «тупая труба» — принимает Telegram-сообщения, зовёт Claude Code подпроцессом (claude -p), возвращает ответ. Node НИКОГДА не ходит в Anthropic API напрямую.",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node --env-file=.env --watch src/index.js",
+    "start": "node --env-file=.env src/index.js",
+    "smoke": "node scripts/smoke-db.mjs && node scripts/smoke-tasks.mjs && node scripts/smoke-queue.mjs && node scripts/smoke-card.mjs && node scripts/smoke-variants.mjs && node scripts/smoke-rework.mjs && node scripts/smoke-publish.mjs && node scripts/smoke-ig-threads.mjs && node scripts/smoke-preflight.mjs && node scripts/smoke-browser.mjs && node scripts/smoke-render.mjs && node scripts/smoke-pdf.mjs && node scripts/smoke-visuals.mjs && node scripts/smoke-video.mjs && node scripts/smoke-jobs.mjs && node scripts/smoke-analytics.mjs && node scripts/smoke-brain.mjs && node scripts/smoke-funnel.mjs && node scripts/smoke-manychat.mjs && node scripts/smoke-trends.mjs && node scripts/smoke-claude.mjs && node scripts/smoke-agent.mjs && node scripts/smoke-router.mjs && node scripts/smoke-send.mjs && node scripts/smoke-orchestrator.mjs",
+    "demo:agent": "node scripts/demo-agent-contract.mjs",
+    "ingest:video": "node --env-file=.env scripts/ingest-video.mjs",
+    "video:jobs": "node --env-file=.env scripts/video-jobs.mjs",
+    "live:t05": "node --env-file=.env scripts/live-orchestration.mjs",
+    "live:t08": "node --env-file=.env scripts/live-publish.mjs",
+    "live:t10": "node --env-file=.env scripts/live-render.mjs",
+    "live:t13": "node --env-file=.env scripts/live-funnel-pdf.mjs",
+    "check:meta": "node --env-file=.env scripts/check-meta.mjs",
+    "ig:login": "node --env-file=.env scripts/ig-login.mjs"
+  },
+  "dependencies": {
+    "grammy": "^1.46.0"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "_": "Кого смотрит Разведчик. Скопируй этот файл в trends/sources.json и впиши свои аккаунты и хэштеги. Токена Apify здесь НЕТ — он только в dispatcher/.env (APIFY_TOKEN). Ключи, начинающиеся с _, игнорируются: это подсказки.",
+
+  "limits": {
+    "_": "Страховка от лишних трат и лишнего внимания площадок.",
+    "runsPerDay": 1,
+    "postsPerSource": 12,
+    "maxPostsPerRun": 60
+  },
+
+  "platforms": {
+    "ig": {
+      "_": "Instagram. actor — id актора из Apify Store, который ты выбрал и оплатил.",
+      "enabled": true,
+      "actor": "apify/instagram-scraper",
+      "accounts": ["nike", "adidas"],
+      "hashtags": ["маркетинг"],
+      "request": {
+        "_": "Как класть цели в вход актора. Поля разные у разных акторов — смотри Input schema актора на его странице в Apify.",
+        "urlsField": "directUrls",
+        "limitField": "resultsLimit",
+        "extra": { "resultsType": "posts" }
+      },
+      "map": {
+        "_": "Необязательно. Как называются поля в выдаче актора, если они нестандартные. Пусто = автоопределение по типовым именам (url, caption, likesCount, …)."
+      }
+    },
+
+    "threads": {
+      "_": "Threads. Официального актора у Apify нет — выбери подходящий в Apify Store, впиши его id сюда и поставь enabled: true.",
+      "enabled": false,
+      "actor": "",
+      "accounts": ["zuck"],
+      "hashtags": [],
+      "request": {
+        "urlsField": "urls",
+        "limitField": "resultsLimit",
+        "extra": {}
+      },
+      "map": {}
+    }
+  }
+}

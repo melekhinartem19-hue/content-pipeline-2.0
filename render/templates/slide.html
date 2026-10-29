@@ -1,0 +1,170 @@
+<!doctype html>
+<!--
+  Композиция одного слайда карусели/обложки (T10). Формат 1080×1350 (4:5) — вертикаль Instagram.
+
+  ЭТО ГЛАВНЫЙ ФАЙЛ ДЛЯ ПРАВКИ ВНЕШНЕГО ВИДА. Чтобы поменять вёрстку, отступы или типографику,
+  правьте CSS здесь — трогать JS не нужно. Скриншот снимает render/index.js через headless Chromium.
+
+  Значения в двойных фигурных скобках (BG, TITLE, MOTIF …) подставляет render/html.js.
+  Все текстовые значения экранируются там же, поэтому вставлять сюда что-то от агента напрямую
+  нельзя. Ключи — только латиница в верхнем регистре: смоук проверяет, что подставились все.
+
+  Цвета и шрифт приезжают из brand-brain/08-visual-style.md (см. render/theme.js).
+  Пустой слот = нейтральная тёмная тема, это ожидаемо до наполнения клиентом.
+-->
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --bg: {{BG}};
+        --fg: {{FG}};
+        --accent: {{ACCENT}};
+        --on-accent: {{ON_ACCENT}};
+        --pad: 96px;
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        width: {{W}}px;
+        height: {{H}}px;
+        overflow: hidden;
+      }
+
+      body {
+        font-family: {{FONT}};
+        background: var(--bg);
+        color: var(--fg);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      .slide {
+        position: relative;
+        width: {{W}}px;
+        height: {{H}}px;
+        padding: var(--pad);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+      }
+
+      /* Абстрактный акцент-мотив: рисуется под контентом, никогда его не перекрывает. */
+      .motif {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .motif svg { width: 100%; height: 100%; display: block; }
+
+      .row { position: relative; z-index: 1; }
+
+      /* ── Шапка: номер слайда и тонкая линия ─────────────────────────── */
+      .head {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+      .badge {
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 12px 26px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: var(--on-accent);
+        white-space: nowrap;
+      }
+      .rule {
+        flex: 1;
+        height: 3px;
+        background: currentColor;
+        opacity: 0.22;
+      }
+
+      /* ── Тело: заголовок + текст ────────────────────────────────────── */
+      .body {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        flex: 1;
+        justify-content: center;
+        padding: 56px 0;
+      }
+      .title {
+        font-size: {{TITLE_SIZE}}px;
+        line-height: 1.06;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .text {
+        font-size: {{TEXT_SIZE}}px;
+        line-height: 1.38;
+        font-weight: 400;
+        opacity: 0.9;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .title:empty, .text:empty { display: none; }
+
+      /* ── Подвал: подпись бренда ─────────────────────────────────────── */
+      .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 28px;
+        letter-spacing: 0.06em;
+        opacity: 0.72;
+      }
+      .foot:empty { display: none; }
+
+      /* ── Роли слайдов ───────────────────────────────────────────────── */
+
+      /* Обложка-хук: заголовок во весь кадр, текст — подводка под ним. */
+      [data-role='cover'] .body { justify-content: flex-end; gap: 32px; }
+      [data-role='cover'] .title { letter-spacing: -0.03em; }
+      [data-role='cover'] .text { opacity: 0.78; }
+
+      /* Раскрытие: заголовок скромнее, основной вес — на тексте. */
+      [data-role='body'] .title { font-size: calc({{TITLE_SIZE}}px * 0.62); font-weight: 700; }
+      [data-role='body'] .title::after {
+        content: '';
+        display: block;
+        width: 120px;
+        height: 8px;
+        margin-top: 28px;
+        background: var(--accent);
+        border-radius: 4px;
+      }
+
+      /* Финал с призывом: акцент заливает кадр — слайд видно в ленте даже боковым зрением. */
+      [data-role='cta'] { background: var(--accent); color: var(--on-accent); }
+      [data-role='cta'] .badge { background: var(--on-accent); color: var(--accent); }
+      [data-role='cta'] .title { font-size: calc({{TITLE_SIZE}}px * 0.78); }
+      [data-role='cta'] .text { opacity: 0.86; }
+      [data-role='cta'] .motif { opacity: 0.5; }
+    </style>
+  </head>
+  <body>
+    <div class="slide" data-role="{{ROLE}}">
+      <div class="motif">{{MOTIF}}</div>
+
+      <div class="row head">
+        <span class="badge">{{BADGE}}</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="row body">
+        <div class="title">{{TITLE}}</div>
+        <div class="text">{{TEXT}}</div>
+      </div>
+
+      <div class="row foot">{{HANDLE}}</div>
+    </div>
+  </body>
+</html>
